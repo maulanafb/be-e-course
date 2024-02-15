@@ -28,10 +28,18 @@ func (h *UserHandler) RegisterUser(c *fiber.Ctx) error {
 		response := helper.FiberAPIResponse(c, "Register account failedd", http.StatusUnprocessableEntity, "error", errorMessage)
 		return response
 	}
-
+	checkEmail, err := h.userService.CheckingEmail(input.Email)
+	fmt.Println(checkEmail, err)
+	if err != nil {
+		return err
+	}
+	if checkEmail {
+		response := helper.FiberAPIResponse(c, "Email Already Registered", http.StatusBadRequest, "error", nil)
+		return response
+	}
 	newUser, err := h.userService.RegisterUser(input)
 	if err != nil {
-		response := helper.FiberAPIResponse(c, "Register account failed2", http.StatusBadRequest, "error", nil)
+		response := helper.FiberAPIResponse(c, "Register account failed", http.StatusBadRequest, "error", nil)
 		return response
 	}
 

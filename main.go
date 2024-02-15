@@ -53,7 +53,7 @@ func main() {
 	api.Post("/sessions", userHandler.Login)
 
 	// Use the authMiddleware
-	api.Use(authMiddleware(authService, userService))
+	// api.Use(authMiddleware(authService, userService))
 
 	app.Listen(":8088")
 }

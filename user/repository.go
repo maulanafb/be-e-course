@@ -8,6 +8,7 @@ type Repository interface {
 	FindByID(ID int) (User, error)
 	Update(user User) (User, error)
 	FindAll() ([]User, error)
+	CheckEmail(email string) (bool, error)
 }
 
 type repository struct {
@@ -68,4 +69,15 @@ func (r *repository) FindAll() ([]User, error) {
 	}
 
 	return users, nil
+}
+
+func (r *repository) CheckEmail(email string) (bool, error) {
+	var user User
+
+	err := r.db.Where("email = ?", email).Find(&user).Error
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

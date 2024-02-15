@@ -14,6 +14,7 @@ type Service interface {
 	GetUserByID(ID int) (User, error)
 	GetAllUsers() ([]User, error)
 	UpdateUser(input FormUpdateUserInput) (User, error)
+	CheckingEmail(email string) (bool, error)
 }
 
 type service struct {
@@ -136,4 +137,12 @@ func (s *service) UpdateUser(input FormUpdateUserInput) (User, error) {
 	}
 
 	return updatedUser, nil
+}
+
+func (s *service) CheckingEmail(email string) (bool, error) {
+	check, err := s.repository.CheckEmail(email)
+	if err != nil {
+		return true, err
+	}
+	return check, nil
 }
