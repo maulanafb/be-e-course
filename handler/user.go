@@ -29,11 +29,11 @@ func (h *UserHandler) RegisterUser(c *fiber.Ctx) error {
 		return response
 	}
 	checkEmail, err := h.userService.CheckingEmail(input.Email)
-	fmt.Println(checkEmail, err)
+	// fmt.Println(checkEmail, err)
 	if err != nil {
 		return err
 	}
-	if checkEmail {
+	if checkEmail.Email == input.Email {
 		response := helper.FiberAPIResponse(c, "Email Already Registered", http.StatusBadRequest, "error", nil)
 		return response
 	}

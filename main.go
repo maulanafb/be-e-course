@@ -4,11 +4,13 @@ import (
 	"be_online_course/auth"
 	"be_online_course/handler"
 	"be_online_course/helper"
+	"be_online_course/migrations"
 	"be_online_course/user"
 	"fmt"
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -19,8 +21,14 @@ import (
 )
 
 func main() {
+	GormConfig := &gorm.Config{
+		// ...
+		NowFunc: func() time.Time {
+			return time.Now().Local()
+		},
+	}
 	dsn := "root:@tcp(127.0.0.1:3306)/be-e-course?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(dsn), GormConfig)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -33,9 +41,9 @@ func main() {
 	authService := auth.NewService()
 
 	// Uncomment the line below to perform database migrations
-	// if err := migrations.Migrate(db); err != nil {
-	// 	log.Fatal(err)
-	// }
+	if err := migrations.Migrate(db); err != nil {
+		log.Fatal(err)
+	}
 	userHandler := handler.NewUserHandler(userService, authService)
 
 	app := fiber.New()
@@ -51,6 +59,8 @@ func main() {
 	api := app.Group("/api/v1")
 	api.Post("/users", userHandler.RegisterUser)
 	api.Post("/sessions", userHandler.Login)
+
+	api.Get("/gogo", authMiddleware(authService, userService), roleMiddleware("admin"))
 
 	// Use the authMiddleware
 	// api.Use(authMiddleware(authService, userService))
@@ -93,6 +103,22 @@ func authMiddleware(authService auth.Service, userService user.Service) fiber.Ha
 
 		// Set the user in the context
 		c.Locals("currentUser", user)
+		return c.Next()
+	}
+}
+
+func roleMiddleware(requiredRole string) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		// Ambil currentUser dari context
+		currentUser := c.Locals("currentUser").(user.User)
+		fmt.Println(currentUser)
+		// Periksa apakah currentUser memiliki peran yang sesuai
+		if currentUser.Role != requiredRole {
+			response := helper.APIResponse("Forbidden", http.StatusForbidden, "error", nil)
+			return c.Status(http.StatusForbidden).JSON(response)
+		}
+
+		// Lanjutkan ke handler berikutnya jika peran sesuai
 		return c.Next()
 	}
 }

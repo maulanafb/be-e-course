@@ -15,8 +15,8 @@ func Migrate(db *gorm.DB) error {
 		Status     string
 		Code       string
 		PaymentURL string
-		CreatedAt  time.Time
-		UpdatedAt  time.Time
+		CreatedAt  time.Time `gorm:"default:current_timestamp"`
+		UpdatedAt  time.Time `gorm:"default:current_timestamp"`
 	}
 
 	type User struct {
@@ -25,57 +25,57 @@ func Migrate(db *gorm.DB) error {
 		Name      string `gorm:"nullable"`
 		Image     string `gorm:"nullable"`
 		Password  string
-		Role      string `gorm:"default:'user'"`
-		CreatedAt time.Time
-		UpdatedAt time.Time
+		Role      string    `gorm:"default:'user'"`
+		CreatedAt time.Time `gorm:"default:current_timestamp"`
+		UpdatedAt time.Time `gorm:"default:current_timestamp"`
 	}
 	type Course struct {
-		ID          string
+		ID          int
 		Name        string
 		Slug        string `gorm:"unique"`
 		Thumbnail   string
 		Price       int
 		Level       string `gorm:"default:'BEGINNER'"`
 		Description string
-		MentorID    string `gorm:"column:mentorId"`
-		CategoryID  string `gorm:"column:categoryId"`
-		CreatedAt   time.Time
-		UpdatedAt   time.Time
+		MentorID    string    `gorm:"column:mentorId"`
+		CategoryID  string    `gorm:"column:categoryId"`
+		CreatedAt   time.Time `gorm:"default:current_timestamp"`
+		UpdatedAt   time.Time `gorm:"default:current_timestamp"`
 	}
 
 	type Category struct {
-		ID        string
-		Title     string `gorm:"unique"`
-		CreatedAt time.Time
-		UpdatedAt time.Time
+		ID        int
+		Title     string    `gorm:"unique"`
+		CreatedAt time.Time `gorm:"default:current_timestamp"`
+		UpdatedAt time.Time `gorm:"default:current_timestamp"`
 	}
 
 	type Mentor struct {
-		ID        string
+		ID        int
 		Name      string
 		Thumbnail string
-		CreatedAt time.Time
-		UpdatedAt time.Time
+		CreatedAt time.Time `gorm:"default:current_timestamp"`
+		UpdatedAt time.Time `gorm:"default:current_timestamp"`
 	}
 
 	type Chapter struct {
-		ID        string
+		ID        int
 		Title     string
-		CourseID  string `gorm:"column:courseId"`
-		CreatedAt time.Time
-		UpdatedAt time.Time
+		CourseID  string    `gorm:"column:courseId"`
+		CreatedAt time.Time `gorm:"default:current_timestamp"`
+		UpdatedAt time.Time `gorm:"default:current_timestamp"`
 	}
 
 	type Lesson struct {
-		ID          string
+		ID          int
 		Title       string
 		Content     string
-		IsFree      bool   `gorm:"default:false"`
-		MentorNote  string `gorm:"nullable"`
-		IsCompleted bool   `gorm:"default:false"`
-		ChapterID   string `gorm:"column:chapterId"`
-		CreatedAt   time.Time
-		UpdatedAt   time.Time
+		IsFree      bool      `gorm:"default:false"`
+		MentorNote  string    `gorm:"nullable"`
+		IsCompleted bool      `gorm:"default:false"`
+		ChapterID   string    `gorm:"column:chapterId"`
+		CreatedAt   time.Time `gorm:"default:current_timestamp"`
+		UpdatedAt   time.Time `gorm:"default:current_timestamp"`
 	}
 
 	return db.AutoMigrate(&Transaction{}, &User{}, &Course{}, &Category{}, &Mentor{}, &Chapter{}, &Lesson{})

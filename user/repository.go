@@ -1,6 +1,8 @@
 package user
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type Repository interface {
 	Save(user User) (User, error)
@@ -8,7 +10,7 @@ type Repository interface {
 	FindByID(ID int) (User, error)
 	Update(user User) (User, error)
 	FindAll() ([]User, error)
-	CheckEmail(email string) (bool, error)
+	// CheckEmail(email string) (bool, error)
 }
 
 type repository struct {
@@ -71,13 +73,14 @@ func (r *repository) FindAll() ([]User, error) {
 	return users, nil
 }
 
-func (r *repository) CheckEmail(email string) (bool, error) {
-	var user User
+// func (r *repository) CheckEmail(email string) (bool, error) {
+// 	var user User
 
-	err := r.db.Where("email = ?", email).Find(&user).Error
-	if err != nil {
-		return false, err
-	}
+// 	err := r.db.Where("email = ?", email).Find(&user).Error
+// 	if err == nil {
+// 		return false, err
+// 	}
+// 	fmt.Println("repo", err)
 
-	return true, nil
-}
+// 	return true, nil
+// }

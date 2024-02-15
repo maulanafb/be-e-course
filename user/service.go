@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -14,7 +15,7 @@ type Service interface {
 	GetUserByID(ID int) (User, error)
 	GetAllUsers() ([]User, error)
 	UpdateUser(input FormUpdateUserInput) (User, error)
-	CheckingEmail(email string) (bool, error)
+	CheckingEmail(email string) (User, error)
 }
 
 type service struct {
@@ -139,10 +140,11 @@ func (s *service) UpdateUser(input FormUpdateUserInput) (User, error) {
 	return updatedUser, nil
 }
 
-func (s *service) CheckingEmail(email string) (bool, error) {
-	check, err := s.repository.CheckEmail(email)
+func (s *service) CheckingEmail(email string) (User, error) {
+	check, err := s.repository.FindByEmail(email)
+	fmt.Println(check)
 	if err != nil {
-		return true, err
+		return check, err
 	}
 	return check, nil
 }
