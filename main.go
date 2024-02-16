@@ -3,6 +3,8 @@ package main
 import (
 	"be_online_course/auth"
 	"be_online_course/category"
+	"be_online_course/chapter"
+	"be_online_course/course"
 	"be_online_course/handler"
 	"be_online_course/helper"
 	"be_online_course/migrations"
@@ -37,10 +39,14 @@ func main() {
 
 	userRepository := user.NewRepository(db)
 	categoryRepository := category.NewRepository(db)
+	courseRepository := course.NewRepository(db)
+	chapterRepository := chapter.NewRepository(db)
 
 	userService := user.NewService(userRepository)
 	authService := auth.NewService()
 	categoryService := category.NewService(categoryRepository)
+	courseService := course.NewService(courseRepository)
+	chapterService := chapter.NewService(chapterRepository)
 
 	// Uncomment the line below to perform database migrations
 	if err := migrations.Migrate(db); err != nil {
@@ -48,6 +54,8 @@ func main() {
 	}
 	userHandler := handler.NewUserHandler(userService, authService)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
+	courseHandler := handler.NewCourseHandler(courseService)
+	chapterHandler := handler.NewChapterHandler(chapterService)
 
 	app := fiber.New()
 
@@ -70,6 +78,9 @@ func main() {
 	api.Put("/category/:id", authMiddleware(authService, userService), roleMiddleware("admin"), categoryHandler.UpdateCategory)
 	api.Delete("/category/:id/delete", authMiddleware(authService, userService), roleMiddleware("admin"), categoryHandler.DeleteCategory)
 
+	api.Post("/course/create", authMiddleware(authService, userService), roleMiddleware("admin"), courseHandler.CreateCourse)
+
+	api.Post("/chapter/create", authMiddleware(authService, userService), roleMiddleware("admin"), chapterHandler.CreateChapter)
 	// Use the authMiddleware
 	// api.Use(authMiddleware(authService, userService))
 

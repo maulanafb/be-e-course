@@ -54,7 +54,7 @@ func (h *categoryHandler) GetCategoryByTitle(c *fiber.Ctx) error {
 	newCategory, err := h.service.GetCategoryByTitle(input.Title)
 	if err != nil {
 		// Log the error for debugging purposes
-		fmt.Println("Error retrieving category:", err)
+		fmt.Println("Error retrieving categoryy:", err)
 
 		response := helper.APIResponse("Category Not Foundd", http.StatusInternalServerError, "error", nil)
 		return c.Status(http.StatusInternalServerError).JSON(response)

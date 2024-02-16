@@ -8,9 +8,9 @@ import (
 
 func Migrate(db *gorm.DB) error {
 	type Transaction struct {
-		ID         int
-		CourseID   int
-		UserID     int
+		ID         uint
+		CourseID   uint `gorm:"column:course_id"`
+		UserID     uint `gorm:"column:user_id"`
 		Amount     int
 		Status     string
 		Code       string
@@ -20,7 +20,7 @@ func Migrate(db *gorm.DB) error {
 	}
 
 	type User struct {
-		ID        int
+		ID        uint
 		Email     string `gorm:"unique"`
 		Name      string `gorm:"nullable"`
 		Image     string `gorm:"nullable"`
@@ -30,28 +30,28 @@ func Migrate(db *gorm.DB) error {
 		UpdatedAt time.Time `gorm:"default:current_timestamp"`
 	}
 	type Course struct {
-		ID          int
+		ID          uint
 		Name        string
 		Slug        string `gorm:"unique"`
 		Thumbnail   string
 		Price       int
 		Level       string `gorm:"default:'BEGINNER'"`
 		Description string
-		MentorID    string    `gorm:"column:mentorId"`
-		CategoryID  string    `gorm:"column:categoryId"`
+		MentorID    uint      `gorm:"column:mentor_id"`
+		CategoryID  uint      `gorm:"column:category_id"`
 		CreatedAt   time.Time `gorm:"default:current_timestamp"`
 		UpdatedAt   time.Time `gorm:"default:current_timestamp"`
 	}
 
 	type Category struct {
-		ID        int
+		ID        uint
 		Title     string    `gorm:"unique"`
 		CreatedAt time.Time `gorm:"default:current_timestamp"`
 		UpdatedAt time.Time `gorm:"default:current_timestamp"`
 	}
 
 	type Mentor struct {
-		ID        int
+		ID        uint
 		Name      string
 		Thumbnail string
 		CreatedAt time.Time `gorm:"default:current_timestamp"`
@@ -59,21 +59,21 @@ func Migrate(db *gorm.DB) error {
 	}
 
 	type Chapter struct {
-		ID        int
+		ID        uint
 		Title     string
-		CourseID  string    `gorm:"column:courseId"`
+		CourseID  uint      `gorm:"column:course_id"`
 		CreatedAt time.Time `gorm:"default:current_timestamp"`
 		UpdatedAt time.Time `gorm:"default:current_timestamp"`
 	}
 
 	type Lesson struct {
-		ID          int
+		ID          uint
 		Title       string
 		Content     string
 		IsFree      bool      `gorm:"default:false"`
 		MentorNote  string    `gorm:"nullable"`
 		IsCompleted bool      `gorm:"default:false"`
-		ChapterID   string    `gorm:"column:chapterId"`
+		ChapterID   uint      `gorm:"column:chapter_id"`
 		CreatedAt   time.Time `gorm:"default:current_timestamp"`
 		UpdatedAt   time.Time `gorm:"default:current_timestamp"`
 	}

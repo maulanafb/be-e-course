@@ -1,7 +1,7 @@
 package transaction
 
 import (
-	course "be_online_course/course"
+	"be_online_course/course"
 	"be_online_course/user"
 	"time"
 )

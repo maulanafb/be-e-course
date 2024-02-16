@@ -58,7 +58,7 @@ func (h *UserHandler) Login(c *fiber.Ctx) error {
 	if err := c.BodyParser(&input); err != nil {
 		errors := helper.FormatValidationError(err)
 		errorMessage := fiber.Map{"errors": errors}
-		response := helper.FiberAPIResponse(c, "Login failed", http.StatusUnprocessableEntity, "error", errorMessage)
+		response := helper.FiberAPIResponse(c, "Login failedd", http.StatusUnprocessableEntity, "error", errorMessage)
 		return response
 	}
 
