@@ -2,6 +2,7 @@ package main
 
 import (
 	"be_online_course/auth"
+	"be_online_course/category"
 	"be_online_course/handler"
 	"be_online_course/helper"
 	"be_online_course/migrations"
@@ -35,16 +36,18 @@ func main() {
 	fmt.Println("Database connected successfully")
 
 	userRepository := user.NewRepository(db)
+	categoryRepository := category.NewRepository(db)
 
 	userService := user.NewService(userRepository)
-
 	authService := auth.NewService()
+	categoryService := category.NewService(categoryRepository)
 
 	// Uncomment the line below to perform database migrations
 	if err := migrations.Migrate(db); err != nil {
 		log.Fatal(err)
 	}
 	userHandler := handler.NewUserHandler(userService, authService)
+	categoryHandler := handler.NewCategoryHandler(categoryService)
 
 	app := fiber.New()
 
@@ -59,7 +62,7 @@ func main() {
 	api := app.Group("/api/v1")
 	api.Post("/users", userHandler.RegisterUser)
 	api.Post("/sessions", userHandler.Login)
-
+	api.Post("/category", authMiddleware(authService, userService), roleMiddleware("admin"), categoryHandler.CreateCategory)
 	api.Get("/gogo", authMiddleware(authService, userService), roleMiddleware("admin"))
 
 	// Use the authMiddleware

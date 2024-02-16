@@ -3,15 +3,15 @@ package course
 import "time"
 
 type Course struct {
-	ID          string
+	ID          int
 	Name        string
-	Slug        string `gorm:"unique"`
+	Slug        string
 	Thumbnail   string
 	Price       int
-	Level       string `gorm:"default:'BEGINNER'"`
+	Level       string
 	Description string
-	MentorID    string `gorm:"column:mentorId"`
-	CategoryID  string `gorm:"column:categoryId"`
+	MentorID    string
+	CategoryID  string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
