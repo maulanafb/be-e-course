@@ -10,6 +10,7 @@ type Service interface {
 	CreateCategory(input CreateCategoryInput) (Category, error)
 	GetCategoryByTitle(title string) (Category, error)
 	GetAllCategories() ([]Category, error)
+	UpdateCategory(inputID InputIDCategory, inputData InputDataCategory) (Category, error)
 }
 
 func NewService(repository Repository) *service {
@@ -47,4 +48,18 @@ func (s *service) GetAllCategories() ([]Category, error) {
 		return categories, err
 	}
 	return categories, nil
+}
+
+func (s *service) UpdateCategory(inputID InputIDCategory, inputData InputDataCategory) (Category, error) {
+	category, err := s.repository.FindByID(inputID.ID)
+	if err != nil {
+		return category, err
+	}
+	category.Title = inputData.Title
+
+	updatedCategory, err := s.repository.Update(category)
+	if err != nil {
+		return updatedCategory, err
+	}
+	return updatedCategory, nil
 }

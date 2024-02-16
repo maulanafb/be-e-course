@@ -66,6 +66,8 @@ func main() {
 	api.Post("/category", authMiddleware(authService, userService), roleMiddleware("admin"), categoryHandler.CreateCategory)
 	api.Get("/category/:title", authMiddleware(authService, userService), categoryHandler.GetCategoryByTitle)
 	api.Get("/categories/", authMiddleware(authService, userService), categoryHandler.GetCategories)
+	api.Get("/categories/", authMiddleware(authService, userService), categoryHandler.GetCategories)
+	api.Put("/category/:id", authMiddleware(authService, userService), roleMiddleware("admin"), categoryHandler.UpdateCategory)
 
 	// Use the authMiddleware
 	// api.Use(authMiddleware(authService, userService))

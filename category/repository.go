@@ -9,7 +9,9 @@ type repository struct {
 type Repository interface {
 	Save(category Category) (Category, error)
 	FindByTitle(title string) (Category, error)
+	FindByID(ID int) (Category, error)
 	FindAll() ([]Category, error)
+	Update(category Category) (Category, error)
 }
 
 func NewRepository(db *gorm.DB) *repository {
@@ -33,6 +35,15 @@ func (r *repository) FindByTitle(title string) (Category, error) {
 	return category, nil
 }
 
+func (r *repository) FindByID(title int) (Category, error) {
+	var category Category
+	err := r.db.Where("id = ?", title).First(&category).Error
+	if err != nil {
+		return category, err
+	}
+	return category, nil
+}
+
 func (r *repository) FindAll() ([]Category, error) {
 	var categories []Category
 	err := r.db.Find(&categories).Error
@@ -40,4 +51,12 @@ func (r *repository) FindAll() ([]Category, error) {
 		return categories, err
 	}
 	return categories, nil
+}
+
+func (r *repository) Update(category Category) (Category, error) {
+	err := r.db.Save(&category).Error
+	if err != nil {
+		return category, err
+	}
+	return category, nil
 }

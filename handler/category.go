@@ -5,6 +5,7 @@ import (
 	"be_online_course/helper"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -76,6 +77,38 @@ func (h *categoryHandler) GetCategories(c *fiber.Ctx) error {
 		response := helper.APIResponse("Category Not Found", http.StatusInternalServerError, "error", nil)
 		return c.Status(http.StatusInternalServerError).JSON(response)
 	}
-	response := helper.APIResponse("Category retrieved successfully", http.StatusOK, "success", categories)
+	formattedCategories := category.FormatCategories(categories)
+	response := helper.APIResponse("Category retrieved successfully", http.StatusOK, "success", formattedCategories)
+	return c.Status(http.StatusOK).JSON(response)
+}
+
+func (h *categoryHandler) UpdateCategory(c *fiber.Ctx) error {
+	var inputID category.InputIDCategory
+
+	param, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return err
+	}
+	inputID.ID = param
+
+	var inputData category.InputDataCategory
+
+	if err := c.BodyParser(&inputData); err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := fiber.Map{"errors": errors}
+
+		response := helper.APIResponse("Failed to create category", http.StatusUnprocessableEntity, "error", errorMessage)
+		return c.Status(http.StatusUnprocessableEntity).JSON(response)
+	}
+	updatedCategory, err := h.service.UpdateCategory(inputID, inputData)
+	if err != nil {
+		// Log the error for debugging purposes
+		fmt.Println("Error retrieving category:", err)
+
+		response := helper.APIResponse("Category Not Found", http.StatusInternalServerError, "error", nil)
+		return c.Status(http.StatusInternalServerError).JSON(response)
+	}
+
+	response := helper.APIResponse("success to update campaign", http.StatusOK, "success", category.FormatCategory(updatedCategory))
 	return c.Status(http.StatusOK).JSON(response)
 }
