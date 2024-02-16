@@ -62,8 +62,10 @@ func main() {
 	api := app.Group("/api/v1")
 	api.Post("/users", userHandler.RegisterUser)
 	api.Post("/sessions", userHandler.Login)
+
 	api.Post("/category", authMiddleware(authService, userService), roleMiddleware("admin"), categoryHandler.CreateCategory)
-	api.Get("/gogo", authMiddleware(authService, userService), roleMiddleware("admin"))
+	api.Get("/category/:title", authMiddleware(authService, userService), categoryHandler.GetCategoryByTitle)
+	api.Get("/categories/", authMiddleware(authService, userService), categoryHandler.GetCategories)
 
 	// Use the authMiddleware
 	// api.Use(authMiddleware(authService, userService))
