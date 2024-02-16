@@ -3,6 +3,7 @@ package course
 import (
 	"be_online_course/category"
 	"be_online_course/chapter"
+	"be_online_course/user"
 	"time"
 )
 
@@ -18,6 +19,7 @@ type Course struct {
 	CategoryID  uint
 	Category    category.Category
 	Chapter     chapter.Chapter
+	Mentor      user.User `gorm:"foreignKey:MentorID"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }

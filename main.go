@@ -79,6 +79,7 @@ func main() {
 	api.Delete("/category/:id/delete", authMiddleware(authService, userService), roleMiddleware("admin"), categoryHandler.DeleteCategory)
 
 	api.Post("/course/create", authMiddleware(authService, userService), roleMiddleware("admin"), courseHandler.CreateCourse)
+	api.Get("/courses", authMiddleware(authService, userService), courseHandler.GetCourses)
 
 	api.Post("/chapter/create", authMiddleware(authService, userService), roleMiddleware("admin"), chapterHandler.CreateChapter)
 	// Use the authMiddleware

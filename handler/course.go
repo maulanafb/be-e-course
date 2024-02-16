@@ -3,6 +3,7 @@ package handler
 import (
 	"be_online_course/course"
 	"be_online_course/helper"
+	"fmt"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -34,5 +35,19 @@ func (h *courseHandler) CreateCourse(c *fiber.Ctx) error {
 	}
 
 	response := helper.APIResponse("course created successfully", http.StatusOK, "success", newCourse)
+	return c.Status(http.StatusOK).JSON(response)
+}
+
+func (h *courseHandler) GetCourses(c *fiber.Ctx) error {
+	courses, err := h.service.GetAllCourses()
+	if err != nil {
+		// Log the error for debugging purposes
+		fmt.Println("Error retrieving courses:", err)
+
+		response := helper.APIResponse("courses Not Found", http.StatusInternalServerError, "error", nil)
+		return c.Status(http.StatusInternalServerError).JSON(response)
+	}
+	// formattedCategories := course.FormatCategories(categories)
+	response := helper.APIResponse("courses retrieved successfully", http.StatusOK, "success", courses)
 	return c.Status(http.StatusOK).JSON(response)
 }

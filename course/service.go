@@ -13,6 +13,7 @@ type service struct {
 // Service interface defines the expected methods
 type Service interface {
 	CreateCourse(input CreateCourseInput) (Course, error)
+	GetAllCourses() ([]Course, error)
 }
 
 // NewService creates a new instance of the service
@@ -35,4 +36,12 @@ func (s *service) CreateCourse(input CreateCourseInput) (Course, error) {
 		return newCourse, err
 	}
 	return newCourse, nil
+}
+
+func (s *service) GetAllCourses() ([]Course, error) {
+	courses, err := s.repository.FindAll()
+	if err != nil {
+		return courses, err
+	}
+	return courses, nil
 }
