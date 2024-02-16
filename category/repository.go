@@ -12,6 +12,7 @@ type Repository interface {
 	FindByID(ID int) (Category, error)
 	FindAll() ([]Category, error)
 	Update(category Category) (Category, error)
+	Delete(ID int) (Category, error)
 }
 
 func NewRepository(db *gorm.DB) *repository {
@@ -58,5 +59,16 @@ func (r *repository) Update(category Category) (Category, error) {
 	if err != nil {
 		return category, err
 	}
+	return category, nil
+}
+
+func (r *repository) Delete(ID int) (Category, error) {
+	var category Category
+
+	err := r.db.Where("id = ?", ID).Delete(&category).Error
+	if err != nil {
+		return category, err
+	}
+
 	return category, nil
 }

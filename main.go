@@ -68,6 +68,7 @@ func main() {
 	api.Get("/categories/", authMiddleware(authService, userService), categoryHandler.GetCategories)
 	api.Get("/categories/", authMiddleware(authService, userService), categoryHandler.GetCategories)
 	api.Put("/category/:id", authMiddleware(authService, userService), roleMiddleware("admin"), categoryHandler.UpdateCategory)
+	api.Delete("/category/:id/delete", authMiddleware(authService, userService), roleMiddleware("admin"), categoryHandler.DeleteCategory)
 
 	// Use the authMiddleware
 	// api.Use(authMiddleware(authService, userService))

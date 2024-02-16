@@ -11,6 +11,7 @@ type Service interface {
 	GetCategoryByTitle(title string) (Category, error)
 	GetAllCategories() ([]Category, error)
 	UpdateCategory(inputID InputIDCategory, inputData InputDataCategory) (Category, error)
+	DeleteCategory(ID int) (Category, error)
 }
 
 func NewService(repository Repository) *service {
@@ -62,4 +63,16 @@ func (s *service) UpdateCategory(inputID InputIDCategory, inputData InputDataCat
 		return updatedCategory, err
 	}
 	return updatedCategory, nil
+}
+
+func (s *service) DeleteCategory(ID int) (Category, error) {
+	category, err := s.repository.FindByID(ID)
+	if err != nil {
+		return category, err
+	}
+	category, err = s.repository.Delete(ID)
+	if err != nil {
+		return category, err
+	}
+	return category, nil
 }
