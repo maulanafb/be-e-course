@@ -3,13 +3,13 @@ package lesson
 import "time"
 
 type Lesson struct {
-	ID          int
+	ID          uint
 	Title       string
 	Content     string
 	IsFree      bool
 	MentorNote  string
 	IsCompleted bool
-	ChapterID   string
+	ChapterID   uint
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }

@@ -8,6 +8,7 @@ type repository struct {
 
 type Repository interface {
 	Save(chapter Chapter) (Chapter, error)
+	FindAll() ([]Chapter, error)
 }
 
 func NewRepository(db *gorm.DB) *repository {
@@ -20,4 +21,13 @@ func (r *repository) Save(chapter Chapter) (Chapter, error) {
 		return chapter, err
 	}
 	return chapter, nil
+}
+
+func (r *repository) FindAll() ([]Chapter, error) {
+	var chapters []Chapter
+	err := r.db.Preload("Lessons").Find(&chapters).Error
+	if err != nil {
+		return chapters, err
+	}
+	return chapters, nil
 }

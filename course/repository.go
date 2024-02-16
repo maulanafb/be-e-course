@@ -25,7 +25,7 @@ func (r *repository) Save(course Course) (Course, error) {
 
 func (r *repository) FindAll() ([]Course, error) {
 	var courses []Course
-	err := r.db.Preload("Category").Preload("Chapter").Preload("Mentor").Find(&courses).Error
+	err := r.db.Preload("Category").Preload("Chapter").Preload("Mentor").Preload("Chapter.Lessons").Find(&courses).Error
 	if err != nil {
 		return courses, err
 	}

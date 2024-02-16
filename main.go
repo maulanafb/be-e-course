@@ -7,6 +7,7 @@ import (
 	"be_online_course/course"
 	"be_online_course/handler"
 	"be_online_course/helper"
+	"be_online_course/lesson"
 	"be_online_course/migrations"
 	"be_online_course/user"
 	"fmt"
@@ -41,12 +42,14 @@ func main() {
 	categoryRepository := category.NewRepository(db)
 	courseRepository := course.NewRepository(db)
 	chapterRepository := chapter.NewRepository(db)
+	lessonRepository := lesson.NewRepository(db)
 
 	userService := user.NewService(userRepository)
 	authService := auth.NewService()
 	categoryService := category.NewService(categoryRepository)
 	courseService := course.NewService(courseRepository)
 	chapterService := chapter.NewService(chapterRepository)
+	lessonService := lesson.NewService(lessonRepository)
 
 	// Uncomment the line below to perform database migrations
 	if err := migrations.Migrate(db); err != nil {
@@ -56,6 +59,7 @@ func main() {
 	categoryHandler := handler.NewCategoryHandler(categoryService)
 	courseHandler := handler.NewCourseHandler(courseService)
 	chapterHandler := handler.NewChapterHandler(chapterService)
+	lessonHandler := handler.NewLessonHandler(lessonService)
 
 	app := fiber.New()
 
@@ -82,6 +86,9 @@ func main() {
 	api.Get("/courses", authMiddleware(authService, userService), courseHandler.GetCourses)
 
 	api.Post("/chapter/create", authMiddleware(authService, userService), roleMiddleware("admin"), chapterHandler.CreateChapter)
+
+	api.Post("/lesson/create", authMiddleware(authService, userService), roleMiddleware("admin"), lessonHandler.CreateLesson)
+
 	// Use the authMiddleware
 	// api.Use(authMiddleware(authService, userService))
 

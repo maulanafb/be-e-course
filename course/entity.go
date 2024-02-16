@@ -18,8 +18,9 @@ type Course struct {
 	MentorID    uint
 	CategoryID  uint
 	Category    category.Category
-	Chapter     chapter.Chapter
-	Mentor      user.User `gorm:"foreignKey:MentorID"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	Chapter     []chapter.Chapter
+	// Lesson      []lesson.Lesson
+	Mentor    user.User `gorm:"foreignKey:MentorID"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
