@@ -2,15 +2,15 @@ package transaction
 
 import "be_online_course/user"
 
-type GetCampaignTransactionsInput struct {
+type GetCourseTransactionsInput struct {
 	ID   int `uri:"id" binding:"required"`
 	User user.User
 }
 
 type CreateTransactionsInput struct {
-	Amount     int `json:"amount" binding:"required"`
-	CampaignID int `json:"campaign_id" binding:"required"`
-	User       user.User
+	Amount   int `json:"amount" binding:"required"`
+	CourseID int `json:"course_id" binding:"required"`
+	User     user.User
 }
 
 type TransactionNotificationInput struct {

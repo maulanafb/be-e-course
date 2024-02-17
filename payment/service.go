@@ -1,6 +1,7 @@
 package payment
 
 import (
+	"be_online_course/course"
 	"be_online_course/user"
 	"fmt"
 	"os"
@@ -22,7 +23,7 @@ func NewService() *service {
 	return &service{}
 }
 
-func (service *service) GetPaymentURL(transaction Transaction, user user.User) (string, error) {
+func (service *service) GetPaymentURL(transaction Transaction, user user.User, course course.Course) (string, error) {
 	// Load environment variables from .env
 	godotenv.Load()
 	// if err != nil {
@@ -48,6 +49,12 @@ func (service *service) GetPaymentURL(transaction Transaction, user user.User) (
 		CustomerDetail: &midtrans.CustomerDetails{
 			Email: user.Email,
 			FName: user.Name,
+		},
+		Items: &[]midtrans.ItemDetails{
+			midtrans.ItemDetails{
+				Name:  course.Name,
+				Price: int64(course.Price),
+			},
 		},
 	}
 	// fmt.Println("isi req", req)

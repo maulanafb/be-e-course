@@ -43,6 +43,15 @@ func Migrate(db *gorm.DB) error {
 		UpdatedAt   time.Time `gorm:"default:current_timestamp"`
 	}
 
+	type CourseImage struct {
+		ID        uint
+		CourseID  uint `gorm:"column:course_id"`
+		FileName  string
+		IsPrimary int
+		CreatedAt time.Time `gorm:"default:current_timestamp"`
+		UpdatedAt time.Time `gorm:"default:current_timestamp"`
+	}
+
 	type Category struct {
 		ID        uint
 		Title     string    `gorm:"unique"`
@@ -78,5 +87,6 @@ func Migrate(db *gorm.DB) error {
 		UpdatedAt   time.Time `gorm:"default:current_timestamp"`
 	}
 
-	return db.AutoMigrate(&Transaction{}, &User{}, &Course{}, &Category{}, &Mentor{}, &Chapter{}, &Lesson{})
+	// return db.AutoMigrate(&Transaction{}, &User{}, &Course{}, &Category{}, &Mentor{}, &Chapter{}, &Lesson{}, &CourseImage{})
+	return db.AutoMigrate(&CourseImage{})
 }
