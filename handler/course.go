@@ -3,8 +3,10 @@ package handler
 import (
 	"be_online_course/course"
 	"be_online_course/helper"
+	"be_online_course/user"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -49,5 +51,55 @@ func (h *courseHandler) GetCourses(c *fiber.Ctx) error {
 	}
 	// formattedCategories := course.FormatCategories(categories)
 	response := helper.APIResponse("courses retrieved successfully", http.StatusOK, "success", courses)
+	return c.Status(http.StatusOK).JSON(response)
+}
+func (h *courseHandler) UploadImage(c *fiber.Ctx) error {
+	var input course.CreateCourseImageInput
+
+	if err := c.BodyParser(&input); err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := fiber.Map{"errors": errors}
+
+		response := helper.APIResponse("Failed to upload course images1", http.StatusUnprocessableEntity, "error", errorMessage)
+		return c.Status(http.StatusUnprocessableEntity).JSON(response)
+	}
+
+	currentUser := c.Locals("currentUser").(user.User)
+	input.User = currentUser
+	userID := currentUser.ID
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		data := fiber.Map{"is_uploaded": false}
+		response := helper.APIResponse("Failed to upload course image2", http.StatusBadRequest, "error", data)
+
+		return c.Status(http.StatusBadRequest).JSON(response)
+	}
+
+	// Get the current date and format it as "2006-01-02" (Year-Month-Day)
+	currentDate := time.Now().Format("2006-01-02")
+
+	// Append the formatted date to the file name
+	path := fmt.Sprintf("images/%d-%s-%s", userID, currentDate, file.Filename)
+
+	err = c.SaveFile(file, path)
+	if err != nil {
+		data := fiber.Map{"is_uploaded": false}
+		response := helper.APIResponse("Failed to upload courses image3", http.StatusBadRequest, "error", data)
+
+		return c.Status(http.StatusBadRequest).JSON(response)
+	}
+
+	_, err = h.service.SaveCourseImage(input, path)
+	if err != nil {
+		data := fiber.Map{"is_uploaded": false}
+		response := helper.APIResponse("Failed to upload course image4", http.StatusBadRequest, "error", data)
+
+		return c.Status(http.StatusBadRequest).JSON(response)
+	}
+
+	data := fiber.Map{"is_uploaded": true}
+	response := helper.APIResponse("courses image successfully uploaded", http.StatusOK, "success", data)
+
 	return c.Status(http.StatusOK).JSON(response)
 }

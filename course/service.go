@@ -14,6 +14,7 @@ type service struct {
 type Service interface {
 	CreateCourse(input CreateCourseInput) (Course, error)
 	GetAllCourses() ([]Course, error)
+	SaveCourseImage(input CreateCourseImageInput, fileLocation string) (CourseImage, error)
 }
 
 // NewService creates a new instance of the service
@@ -44,4 +45,28 @@ func (s *service) GetAllCourses() ([]Course, error) {
 		return courses, err
 	}
 	return courses, nil
+}
+
+func (s *service) SaveCourseImage(input CreateCourseImageInput, fileLocation string) (CourseImage, error) {
+	isPrimary := 0
+	if input.IsPrimary {
+		isPrimary = 1
+
+		_, err := s.repository.MarkAllImagesAsNonPrimary(int(input.CourseID))
+		if err != nil {
+			return CourseImage{}, err
+		}
+	}
+
+	courseImage := CourseImage{}
+	courseImage.CourseID = input.CourseID
+	courseImage.IsPrimary = isPrimary
+	courseImage.FileName = fileLocation
+
+	newCourseImage, err := s.repository.CreateImage(courseImage)
+	if err != nil {
+		return newCourseImage, err
+	}
+
+	return newCourseImage, nil
 }

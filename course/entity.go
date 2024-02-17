@@ -28,7 +28,7 @@ type Course struct {
 
 type CourseImage struct {
 	ID        uint
-	CourseID  uint
+	CourseID  int
 	FileName  string
 	IsPrimary int
 	CreatedAt time.Time

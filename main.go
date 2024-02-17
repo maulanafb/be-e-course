@@ -84,6 +84,7 @@ func main() {
 
 	api.Post("/course/create", authMiddleware(authService, userService), roleMiddleware("admin"), courseHandler.CreateCourse)
 	api.Get("/courses", authMiddleware(authService, userService), courseHandler.GetCourses)
+	api.Post("/campaign-images", authMiddleware(authService, userService), roleMiddleware("admin"), courseHandler.UploadImage)
 
 	api.Post("/chapter/create", authMiddleware(authService, userService), roleMiddleware("admin"), chapterHandler.CreateChapter)
 

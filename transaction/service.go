@@ -83,9 +83,9 @@ func (s *service) CreateTransaction(input CreateTransactionsInput) (Transaction,
 }
 
 func (s *service) ProcessPayment(input TransactionNotificationInput) error {
-	transaction_id, _ := strconv.Atoi(input.OrderID)
+	transactionID, _ := strconv.Atoi(input.OrderID)
 
-	transaction, err := s.repository.GetByID(transaction_id)
+	transaction, err := s.repository.GetByID(transactionID)
 	if err != nil {
 		return err
 	}
@@ -98,25 +98,10 @@ func (s *service) ProcessPayment(input TransactionNotificationInput) error {
 		transaction.Status = "cancelled"
 	}
 
-	updatedTransaction, err := s.repository.Update(transaction)
+	_, err = s.repository.Update(transaction)
 	if err != nil {
 		return err
 	}
-
-	// course, err := s.courseRepository.FindByID(updatedTransaction.CourseID)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// if updatedTransaction.Status == "paid" {
-	// 	// course.BackerCount = campaign.BackerCount + 1
-	// 	// campaign.CurrentAmount = campaign.CurrentAmount + updatedTransaction.Amount
-
-	// 	_, err := s.courseRepository.Update(campaign)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
 
 	return nil
 }
