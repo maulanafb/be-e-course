@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"be_online_course/course"
 	"be_online_course/helper"
 	"be_online_course/transaction"
 	"be_online_course/user"
@@ -10,11 +11,12 @@ import (
 )
 
 type TransactionHandler struct {
-	service transaction.Service
+	service          transaction.Service
+	courseRepository course.Repository
 }
 
-func NewTransactionHandler(service transaction.Service) *TransactionHandler {
-	return &TransactionHandler{service}
+func NewTransactionHandler(service transaction.Service, courseRepository course.Repository) *TransactionHandler {
+	return &TransactionHandler{service, courseRepository}
 }
 
 // func (h *TransactionHandler) GetCampaignTransactions(c *fiber.Ctx) error {
@@ -27,8 +29,8 @@ func NewTransactionHandler(service transaction.Service) *TransactionHandler {
 // 		return c.Status(http.StatusBadRequest).JSON(response)
 // 	}
 
-// 	currentUser := c.Locals("currentUser").(*user.User)
-// 	input.User = *currentUser
+// 	currentUser := c.Locals("currentUser").(user.User)
+// 	input.User = currentUser
 // 	input.ID = campaignID
 
 // 	transactions, err := h.service.GetTransactionsByCourseID(input)
@@ -42,7 +44,7 @@ func NewTransactionHandler(service transaction.Service) *TransactionHandler {
 // }
 
 func (h *TransactionHandler) GetUserTransactions(c *fiber.Ctx) error {
-	currentUser := c.Locals("currentUser").(*user.User)
+	currentUser := c.Locals("currentUser").(user.User)
 	userID := currentUser.ID
 
 	transactions, err := h.service.GetTransactionsByUserID(userID)
@@ -66,8 +68,10 @@ func (h *TransactionHandler) CreateTransaction(c *fiber.Ctx) error {
 		return c.Status(http.StatusUnprocessableEntity).JSON(response)
 	}
 
-	currentUser := c.Locals("currentUser").(*user.User)
-	input.User = *currentUser
+	inputCourse, err := h.courseRepository.FindByID(input.CourseID)
+	currentUser := c.Locals("currentUser").(user.User)
+	input.User = currentUser
+	input.Course = inputCourse
 
 	newTransaction, err := h.service.CreateTransaction(input)
 	if err != nil {

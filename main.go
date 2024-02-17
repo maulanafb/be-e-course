@@ -65,7 +65,7 @@ func main() {
 	courseHandler := handler.NewCourseHandler(courseService)
 	chapterHandler := handler.NewChapterHandler(chapterService)
 	lessonHandler := handler.NewLessonHandler(lessonService)
-	transactionHandler := handler.NewTransactionHandler(transactionService)
+	transactionHandler := handler.NewTransactionHandler(transactionService, courseRepository)
 
 	app := fiber.New()
 

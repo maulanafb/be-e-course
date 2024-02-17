@@ -51,9 +51,11 @@ func (service *service) GetPaymentURL(transaction Transaction, user user.User, c
 			FName: user.Name,
 		},
 		Items: &[]midtrans.ItemDetails{
-			{
-				Name:  course.Name,
+			midtrans.ItemDetails{
+				// ID:    "ITEM1",
 				Price: int64(course.Price),
+				Qty:   1,
+				Name:  course.Name,
 			},
 		},
 	}

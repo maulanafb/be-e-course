@@ -57,8 +57,8 @@ func (s *service) GetTransactionsByUserID(userID int) ([]Transaction, error) {
 
 func (s *service) CreateTransaction(input CreateTransactionsInput) (Transaction, error) {
 	transaction := Transaction{}
-	transaction.CourseID = input.CourseID
-	transaction.Amount = input.Amount
+	transaction.CourseID = int(input.Course.ID)
+	transaction.Amount = input.Course.Price
 	transaction.UserID = input.User.ID
 	transaction.Status = "pending"
 
@@ -66,12 +66,12 @@ func (s *service) CreateTransaction(input CreateTransactionsInput) (Transaction,
 	if err != nil {
 		return newTransaction, err
 	}
-	paymentTranscation := payment.Transaction{
+	paymentTransaction := payment.Transaction{
 		ID:     newTransaction.ID,
 		Amount: newTransaction.Amount,
 	}
 	fmt.Println("sebelum payment url")
-	paymentURL, err := s.paymentService.GetPaymentURL(paymentTranscation, input.User, input.Course)
+	paymentURL, err := s.paymentService.GetPaymentURL(paymentTransaction, input.User, input.Course)
 	if err != nil {
 		return newTransaction, err
 	}
