@@ -16,7 +16,7 @@ type service struct {
 }
 
 type Service interface {
-	GetPaymentURL(transaction Transaction, user user.User) (string, error)
+	GetPaymentURL(transaction Transaction, user user.User, course course.Course) (string, error)
 }
 
 func NewService() *service {
@@ -51,7 +51,7 @@ func (service *service) GetPaymentURL(transaction Transaction, user user.User, c
 			FName: user.Name,
 		},
 		Items: &[]midtrans.ItemDetails{
-			midtrans.ItemDetails{
+			{
 				Name:  course.Name,
 				Price: int64(course.Price),
 			},

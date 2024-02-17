@@ -9,6 +9,8 @@ import (
 	"be_online_course/helper"
 	"be_online_course/lesson"
 	"be_online_course/migrations"
+	"be_online_course/payment"
+	"be_online_course/transaction"
 	"be_online_course/user"
 	"fmt"
 	"log"
@@ -43,6 +45,7 @@ func main() {
 	courseRepository := course.NewRepository(db)
 	chapterRepository := chapter.NewRepository(db)
 	lessonRepository := lesson.NewRepository(db)
+	transactionRepository := transaction.NewRepository(db)
 
 	userService := user.NewService(userRepository)
 	authService := auth.NewService()
@@ -50,6 +53,8 @@ func main() {
 	courseService := course.NewService(courseRepository)
 	chapterService := chapter.NewService(chapterRepository)
 	lessonService := lesson.NewService(lessonRepository)
+	paymentServlice := payment.NewService()
+	transactionService := transaction.NewService(transactionRepository, courseRepository, paymentServlice)
 
 	// Uncomment the line below to perform database migrations
 	if err := migrations.Migrate(db); err != nil {
@@ -60,6 +65,7 @@ func main() {
 	courseHandler := handler.NewCourseHandler(courseService)
 	chapterHandler := handler.NewChapterHandler(chapterService)
 	lessonHandler := handler.NewLessonHandler(lessonService)
+	transactionHandler := handler.NewTransactionHandler(transactionService)
 
 	app := fiber.New()
 
@@ -90,8 +96,8 @@ func main() {
 
 	api.Post("/lesson/create", authMiddleware(authService, userService), roleMiddleware("admin"), lessonHandler.CreateLesson)
 
-	// Use the authMiddleware
-	// api.Use(authMiddleware(authService, userService))
+	api.Post("/transactions", authMiddleware(authService, userService), transactionHandler.CreateTransaction)
+	api.Post("/transactions/notification", transactionHandler.GetNotification)
 
 	app.Listen(":8088")
 }

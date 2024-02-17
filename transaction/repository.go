@@ -7,7 +7,7 @@ type repository struct {
 }
 
 type Repository interface {
-	GetCampaignID(campaignID int) ([]Transaction, error)
+	GetCourseID(courseID int) ([]Transaction, error)
 	GetByUserID(userID int) ([]Transaction, error)
 	GetByID(ID int) (Transaction, error)
 	Save(transaction Transaction) (Transaction, error)
@@ -19,9 +19,9 @@ func NewRepository(db *gorm.DB) *repository {
 	return &repository{db}
 }
 
-func (r *repository) GetCampaignID(campaignID int) ([]Transaction, error) {
+func (r *repository) GetCourseID(courseID int) ([]Transaction, error) {
 	var transaction []Transaction
-	err := r.db.Preload("User").Where("campaign_id = ?", campaignID).Order("id desc").Find(&transaction).Error
+	err := r.db.Preload("User").Where("course = ?", courseID).Order("id desc").Find(&transaction).Error
 	if err != nil {
 		return transaction, err
 	}
@@ -30,7 +30,7 @@ func (r *repository) GetCampaignID(campaignID int) ([]Transaction, error) {
 
 func (r *repository) GetByUserID(userID int) ([]Transaction, error) {
 	var transactions []Transaction
-	err := r.db.Preload("Campaign.CampaignImages", "campaign_images.is_primary = 1").Where("user_id = ?", userID).Order("id desc").Find(&transactions).Error
+	err := r.db.Preload("course.CourseImage", "course_images.is_primary = 1").Where("user_id = ?", userID).Order("id desc").Find(&transactions).Error
 	if err != nil {
 		return transactions, err
 	}
@@ -54,9 +54,9 @@ func (r *repository) Update(transaction Transaction) (Transaction, error) {
 }
 func (r *repository) GetByID(ID int) (Transaction, error) {
 	var transaction Transaction
-	err := r.db.Where("id = ?", ID).Find(&transaction).Error
+	err := r.db.First(&transaction, ID).Error
 	if err != nil {
-		return transaction, err
+		return Transaction{}, err // Return a clear error if the record is not found
 	}
 	return transaction, nil
 }

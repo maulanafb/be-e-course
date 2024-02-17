@@ -1,6 +1,9 @@
 package transaction
 
-import "be_online_course/user"
+import (
+	"be_online_course/course"
+	"be_online_course/user"
+)
 
 type GetCourseTransactionsInput struct {
 	ID   int `uri:"id" binding:"required"`
@@ -11,6 +14,7 @@ type CreateTransactionsInput struct {
 	Amount   int `json:"amount" binding:"required"`
 	CourseID int `json:"course_id" binding:"required"`
 	User     user.User
+	Course   course.Course
 }
 
 type TransactionNotificationInput struct {

@@ -14,7 +14,7 @@ type service struct {
 }
 
 type Service interface {
-	GetTransactionsByCourseID(input GetCourseTransactionsInput) ([]Transaction, error)
+	// GetTransactionsByCourseID(input GetCourseTransactionsInput) ([]Transaction, error)
 	GetTransactionsByUserID(userID int) ([]Transaction, error)
 	CreateTransaction(input CreateTransactionsInput) (Transaction, error)
 	ProcessPayment(input TransactionNotificationInput) error
@@ -25,19 +25,22 @@ func NewService(repository Repository, courseRepository course.Repository, payme
 	return &service{repository, courseRepository, paymentService}
 }
 
-// func (s *service) GetTransactionsByCampaignID(input GetCampaignTransactionsInput) ([]Transaction, error) {
-// 	campaign, err := s.courseRepository.FindByID(input.ID)
+// func (s *service) GetTransactionsByCampaignID(input GetCourseTransactionsInput) ([]Transaction, error) {
+// 	// Retrieve the campaign using the provided campaign ID
+// 	course, err := s.courseRepository.FindByID(input.ID)
 // 	if err != nil {
-// 		return []Transaction{}, err
+// 		return nil, err
 // 	}
 
-// 	if campaign.UserID != input.User.ID {
-// 		return []Transaction{}, errors.New("Not an owner of the campaign")
+// 	// Check if the course is not found
+// 	if course == nil {
+// 		return nil, errors.New("course not found")
 // 	}
 
-// 	transactions, err := s.repository.GetCampaignID(input.ID)
+// 	// Retrieve transactions associated with the course
+// 	transactions, err := s.repository.GetCampaignID(course.ID)
 // 	if err != nil {
-// 		return transactions, err
+// 		return nil, err
 // 	}
 
 // 	return transactions, nil
@@ -68,7 +71,7 @@ func (s *service) CreateTransaction(input CreateTransactionsInput) (Transaction,
 		Amount: newTransaction.Amount,
 	}
 	fmt.Println("sebelum payment url")
-	paymentURL, err := s.paymentService.GetPaymentURL(paymentTranscation, input.User)
+	paymentURL, err := s.paymentService.GetPaymentURL(paymentTranscation, input.User, input.Course)
 	if err != nil {
 		return newTransaction, err
 	}
