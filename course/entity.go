@@ -8,19 +8,18 @@ import (
 )
 
 type Course struct {
-	ID   uint
-	Name string
-	Slug string
-	// Thumbnail   string
+	ID          uint
+	Name        string
+	Slug        string
 	Price       int
 	Level       string
 	Description string
 	MentorID    uint
 	CategoryID  uint
-	Category    []category.Category
+	Category    category.Category
 	Chapter     []chapter.Chapter
-	// Lesson      []lesson.Lesson
-	Mentor      []user.User `gorm:"foreignKey:MentorID"`
+
+	Mentor      user.User `gorm:"foreignKey:MentorID"`
 	CourseImage []CourseImage
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
