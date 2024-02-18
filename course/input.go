@@ -18,3 +18,7 @@ type CreateCourseImageInput struct {
 	IsPrimary bool `form:"is_primary"`
 	User      user.User
 }
+
+type GetCourseBySlugInput struct {
+	Slug string `uri:"slug" binding:"required"`
+}

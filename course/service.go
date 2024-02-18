@@ -15,6 +15,7 @@ type Service interface {
 	CreateCourse(input CreateCourseInput) (Course, error)
 	GetAllCourses() ([]Course, error)
 	SaveCourseImage(input CreateCourseImageInput, fileLocation string) (CourseImage, error)
+	GetCourseBySlug(input string) (Course, error)
 }
 
 // NewService creates a new instance of the service
@@ -69,4 +70,13 @@ func (s *service) SaveCourseImage(input CreateCourseImageInput, fileLocation str
 	}
 
 	return newCourseImage, nil
+}
+
+func (s *service) GetCourseBySlug(input string) (Course, error) {
+	course, err := s.repository.FindBySlug(input)
+	if err != nil {
+		return course, err
+	}
+
+	return course, nil
 }

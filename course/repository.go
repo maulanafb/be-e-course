@@ -11,6 +11,7 @@ type Repository interface {
 	FindAll() ([]Course, error)
 	FindByID(ID int) (Course, error)
 	MarkAllImagesAsNonPrimary(courseID int) (bool, error)
+	FindBySlug(slug string) (Course, error)
 	CreateImage(courseImage CourseImage) (CourseImage, error)
 }
 
@@ -62,4 +63,13 @@ func (r *repository) MarkAllImagesAsNonPrimary(courseID int) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (r *repository) FindBySlug(slug string) (Course, error) {
+	var course Course
+	err := r.db.Preload("Category").Preload("Chapter").Preload("Mentor").Preload("Chapter.Lessons").Preload("CourseImage").Find(&course).Error
+	if err != nil {
+		return course, err
+	}
+	return course, nil
 }

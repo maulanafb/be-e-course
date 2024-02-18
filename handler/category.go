@@ -44,13 +44,10 @@ func (h *categoryHandler) CreateCategory(c *fiber.Ctx) error {
 func (h *categoryHandler) GetCategoryByTitle(c *fiber.Ctx) error {
 	var input category.GetCategoryTitle
 
-	// Retrieve the category title from URL parameters
 	param := c.Params("title")
 
-	// Set the category title in the input struct
 	input.Title = param
 
-	// Call the service to get the category by title
 	newCategory, err := h.service.GetCategoryByTitle(input.Title)
 	if err != nil {
 		// Log the error for debugging purposes

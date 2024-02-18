@@ -103,3 +103,21 @@ func (h *courseHandler) UploadImage(c *fiber.Ctx) error {
 
 	return c.Status(http.StatusOK).JSON(response)
 }
+
+func (h *courseHandler) GetCourseBySlug(c *fiber.Ctx) error {
+	var input course.GetCourseBySlugInput
+
+	param := c.Params("slug")
+
+	input.Slug = param
+
+	newCourse, err := h.service.GetCourseBySlug(input.Slug)
+	if err != nil {
+
+		response := helper.APIResponse("Failed to upload course image4", http.StatusBadRequest, "error", nil)
+
+		return c.Status(http.StatusBadRequest).JSON(response)
+	}
+	response := helper.APIResponse("courses retrieved successfully", http.StatusOK, "success", newCourse)
+	return c.Status(http.StatusOK).JSON(response)
+}

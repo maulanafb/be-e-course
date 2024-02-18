@@ -84,13 +84,13 @@ func main() {
 	api.Post("/category", authMiddleware(authService, userService), roleMiddleware("admin"), categoryHandler.CreateCategory)
 	api.Get("/category/:title", authMiddleware(authService, userService), categoryHandler.GetCategoryByTitle)
 	api.Get("/categories/", authMiddleware(authService, userService), categoryHandler.GetCategories)
-	api.Get("/categories/", authMiddleware(authService, userService), categoryHandler.GetCategories)
 	api.Put("/category/:id", authMiddleware(authService, userService), roleMiddleware("admin"), categoryHandler.UpdateCategory)
 	api.Delete("/category/:id/delete", authMiddleware(authService, userService), roleMiddleware("admin"), categoryHandler.DeleteCategory)
 
 	api.Post("/course/create", authMiddleware(authService, userService), roleMiddleware("admin"), courseHandler.CreateCourse)
 	api.Get("/courses", authMiddleware(authService, userService), courseHandler.GetCourses)
-	api.Post("/campaign-images", authMiddleware(authService, userService), roleMiddleware("admin"), courseHandler.UploadImage)
+	api.Get("/course/:slug", courseHandler.GetCourseBySlug)
+	api.Post("/course-images", authMiddleware(authService, userService), roleMiddleware("admin"), courseHandler.UploadImage)
 
 	api.Post("/chapter/create", authMiddleware(authService, userService), roleMiddleware("admin"), chapterHandler.CreateChapter)
 
