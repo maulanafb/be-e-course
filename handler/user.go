@@ -58,7 +58,7 @@ func (h *UserHandler) Login(c *fiber.Ctx) error {
 	if err := c.BodyParser(&input); err != nil {
 		errors := helper.FormatValidationError(err)
 		errorMessage := fiber.Map{"errors": errors}
-		response := helper.FiberAPIResponse(c, "Login failedd", http.StatusUnprocessableEntity, "error", errorMessage)
+		response := helper.FiberAPIResponse(c, "Login failed", http.StatusUnprocessableEntity, "error", errorMessage)
 		return response
 	}
 
@@ -70,11 +70,20 @@ func (h *UserHandler) Login(c *fiber.Ctx) error {
 		response := helper.FiberAPIResponse(c, "Login failed", http.StatusUnprocessableEntity, "error", errorMessage)
 		return response
 	}
+
 	token, err := h.authService.GenerateToken(loggedinUser.ID)
 	if err != nil {
 		response := helper.FiberAPIResponse(c, "Login failed", http.StatusBadRequest, "error", nil)
 		return response
 	}
+
+	// Set HTTP-only cookie in the response
+	c.Cookie(&fiber.Cookie{
+		Name:  "your_cookie_name", // Set your desired cookie name
+		Value: token,
+		// HTTPOnly: true,
+	})
+
 	formatter := user.FormatUser(loggedinUser, token)
 	response := helper.FiberAPIResponse(c, "Login success", http.StatusOK, "success", formatter)
 	return response
@@ -134,5 +143,15 @@ func (h *UserHandler) UploadAvatar(c *fiber.Ctx) error {
 	}
 	data := fiber.Map{"is_uploaded": true}
 	response := helper.FiberAPIResponse(c, "success upload avatar", http.StatusOK, "success", data)
+	return response
+}
+
+func (h *UserHandler) FetchUser(c *fiber.Ctx) error {
+	currentUser := c.Locals("currentUser").(user.User)
+
+	formatter := user.FormatUser(currentUser, "")
+
+	response := helper.FiberAPIResponse(c, "Successfully fetch user data", http.StatusOK, "success", formatter)
+
 	return response
 }

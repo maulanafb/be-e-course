@@ -67,7 +67,7 @@ func (r *repository) MarkAllImagesAsNonPrimary(courseID int) (bool, error) {
 
 func (r *repository) FindBySlug(slug string) (Course, error) {
 	var course Course
-	err := r.db.Preload("Category").Preload("Chapter").Preload("Mentor").Preload("Chapter.Lessons").Preload("CourseImage").Find(&course).Error
+	err := r.db.Preload("Category").Preload("Chapter").Preload("Mentor").Preload("Chapter.Lessons").Preload("CourseImage").Where("slug = ?", slug).Find(&course).Error
 	if err != nil {
 		return course, err
 	}

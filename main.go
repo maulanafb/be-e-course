@@ -80,6 +80,7 @@ func main() {
 	api := app.Group("/api/v1")
 	api.Post("/users", userHandler.RegisterUser)
 	api.Post("/sessions", userHandler.Login)
+	api.Get("/users/fetch", authMiddleware(authService, userService), userHandler.FetchUser)
 
 	api.Post("/category", authMiddleware(authService, userService), roleMiddleware("admin"), categoryHandler.CreateCategory)
 	api.Get("/category/:title", authMiddleware(authService, userService), categoryHandler.GetCategoryByTitle)
@@ -88,8 +89,10 @@ func main() {
 	api.Delete("/category/:id/delete", authMiddleware(authService, userService), roleMiddleware("admin"), categoryHandler.DeleteCategory)
 
 	api.Post("/course/create", authMiddleware(authService, userService), roleMiddleware("admin"), courseHandler.CreateCourse)
-	api.Get("/courses", authMiddleware(authService, userService), courseHandler.GetCourses)
+	api.Get("/course/dashboard/", authMiddleware(authService, userService), transactionHandler.GetPaidCourses)
+	api.Get("/courses", courseHandler.GetCourses)
 	api.Get("/course/:slug", courseHandler.GetCourseBySlug)
+	api.Get("/course/:slug/detail", courseHandler.GetCourseDetailBySlug)
 	api.Post("/course-images", authMiddleware(authService, userService), roleMiddleware("admin"), courseHandler.UploadImage)
 
 	api.Post("/chapter/create", authMiddleware(authService, userService), roleMiddleware("admin"), chapterHandler.CreateChapter)

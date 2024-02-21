@@ -5,6 +5,7 @@ import (
 	"be_online_course/helper"
 	"be_online_course/transaction"
 	"be_online_course/user"
+	"fmt"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -98,4 +99,18 @@ func (h *TransactionHandler) GetNotification(c *fiber.Ctx) error {
 	}
 
 	return c.Status(http.StatusOK).JSON(input)
+}
+
+func (h *TransactionHandler) GetPaidCourses(c *fiber.Ctx) error {
+	currentUser := c.Locals("currentUser").(user.User)
+	userID := currentUser.ID
+
+	transactions, err := h.service.GetUserByPaidStatus(userID)
+	if err != nil {
+		response := helper.APIResponse("Failed to get user's courses", http.StatusBadRequest, "error", nil)
+		return c.Status(http.StatusBadRequest).JSON(response)
+	}
+	fmt.Println(transactions)
+	response := helper.APIResponse("User's courses ", http.StatusOK, "success", transactions)
+	return c.Status(http.StatusOK).JSON(response)
 }

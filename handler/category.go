@@ -94,13 +94,13 @@ func (h *categoryHandler) UpdateCategory(c *fiber.Ctx) error {
 		errors := helper.FormatValidationError(err)
 		errorMessage := fiber.Map{"errors": errors}
 
-		response := helper.APIResponse("Failed to create category", http.StatusUnprocessableEntity, "error", errorMessage)
+		response := helper.APIResponse("Failed to update category", http.StatusUnprocessableEntity, "error", errorMessage)
 		return c.Status(http.StatusUnprocessableEntity).JSON(response)
 	}
 	updatedCategory, err := h.service.UpdateCategory(inputID, inputData)
 	if err != nil {
 		// Log the error for debugging purposes
-		fmt.Println("Error retrieving category:", err)
+		fmt.Println("Error update category:", err)
 
 		response := helper.APIResponse("Category Not Found", http.StatusInternalServerError, "error", nil)
 		return c.Status(http.StatusInternalServerError).JSON(response)

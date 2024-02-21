@@ -13,6 +13,7 @@ type Repository interface {
 	Save(transaction Transaction) (Transaction, error)
 	Update(transaction Transaction) (Transaction, error)
 	FindAll() ([]Transaction, error)
+	FindUserByPaidStatus(UserID int) ([]Transaction, error)
 }
 
 func NewRepository(db *gorm.DB) *repository {
@@ -69,5 +70,14 @@ func (r *repository) FindAll() ([]Transaction, error) {
 		return transactions, err
 	}
 
+	return transactions, nil
+}
+
+func (r *repository) FindUserByPaidStatus(UserID int) ([]Transaction, error) {
+	var transactions []Transaction
+	err := r.db.Preload("Course.Chapter.Lessons").Where("status = ? AND user_id = ?", "paid", UserID).Find(&transactions).Error
+	if err != nil {
+		return transactions, err
+	}
 	return transactions, nil
 }

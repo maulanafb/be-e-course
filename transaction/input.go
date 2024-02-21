@@ -23,3 +23,7 @@ type TransactionNotificationInput struct {
 	PaymentType       string `json:"payment_type"`
 	FraudStatus       string `json:"fraud_status"`
 }
+
+type GetUserIDInput struct {
+	UserID int `uri:"user_id"`
+}
