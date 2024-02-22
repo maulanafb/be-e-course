@@ -99,7 +99,7 @@ func main() {
 
 	api.Post("/lesson/create", authMiddleware(authService, userService), roleMiddleware("admin"), lessonHandler.CreateLesson)
 
-	api.Post("/transactions", authMiddleware(authService, userService), transactionHandler.CreateTransaction)
+	api.Post("/transactions/:course_slug", authMiddleware(authService, userService), transactionHandler.CreateTransaction)
 	api.Post("/transactions/notification", transactionHandler.GetNotification)
 
 	app.Listen(":8088")

@@ -11,10 +11,11 @@ type GetCourseTransactionsInput struct {
 }
 
 type CreateTransactionsInput struct {
-	Amount   int `json:"amount" binding:"required"`
-	CourseID int `json:"course_id" binding:"required"`
-	User     user.User
-	Course   course.Course
+	CourseID   int
+	Amount     int
+	CourseSlug string `uri:"course_slug" binding:"required"`
+	User       user.User
+	Course     course.Course
 }
 
 type TransactionNotificationInput struct {

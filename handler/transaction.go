@@ -61,18 +61,18 @@ func (h *TransactionHandler) GetUserTransactions(c *fiber.Ctx) error {
 func (h *TransactionHandler) CreateTransaction(c *fiber.Ctx) error {
 	var input transaction.CreateTransactionsInput
 
-	if err := c.BodyParser(&input); err != nil {
-		errors := helper.FormatValidationError(err)
-		errorMessage := fiber.Map{"errors": errors}
-
-		response := helper.APIResponse("Failed to create transaction", http.StatusUnprocessableEntity, "error", errorMessage)
-		return c.Status(http.StatusUnprocessableEntity).JSON(response)
+	param := c.Params("course_slug")
+	inputCourse, err := h.courseRepository.FindBySlug(param)
+	if err != nil {
+		response := helper.APIResponse("Failed to create user's transactions", http.StatusBadRequest, "error", nil)
+		return c.Status(http.StatusBadRequest).JSON(response)
 	}
-
-	inputCourse, err := h.courseRepository.FindByID(input.CourseID)
+	fmt.Println(inputCourse)
 	currentUser := c.Locals("currentUser").(user.User)
 	input.User = currentUser
 	input.Course = inputCourse
+	input.CourseID = int(inputCourse.ID)
+	input.Amount = inputCourse.Price
 
 	newTransaction, err := h.service.CreateTransaction(input)
 	if err != nil {
