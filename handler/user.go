@@ -197,15 +197,25 @@ func (h *UserHandler) GoogleCallback(c *fiber.Ctx) error {
 	defer userInfoResp.Body.Close()
 
 	var userInfo struct {
-		Email string `json:"email"`
-		// ... other fields you may need
+		Email         string `json:"email"`
+		Name          string `json:"name"`           // Full name
+		GivenName     string `json:"given_name"`     // Optional: First name
+		FamilyName    string `json:"family_name"`    // Optional: Last name
+		Picture       string `json:"picture"`        // Optional: Profile picture URL
+		EmailVerified bool   `json:"email_verified"` // Optional: Whether email is verified
+		Locale        string `json:"locale"`         // Optional: User's locale
 	}
+
 	if err := json.NewDecoder(userInfoResp.Body).Decode(&userInfo); err != nil {
 		return err
 	}
-
+	fmt.Println(userInfo)
+	fmt.Println(userInfo.Name)
+	fmt.Println(userInfo.Picture)
+	fmt.Println(userInfo.Email)
 	// Find or create user in database
-	user, err := h.userService.FindOrCreateUserByEmail(userInfo.Email)
+	user, err := h.userService.FindOrCreateUserByEmail(userInfo.Email, userInfo.GivenName)
+
 	if err != nil {
 		return err
 	}
@@ -217,7 +227,7 @@ func (h *UserHandler) GoogleCallback(c *fiber.Ctx) error {
 	}
 
 	// Redirect user to frontend with token
-	redirectURL := fmt.Sprintf("http://localhost:3000/signin?token=%s", jwtToken)
+	redirectURL := fmt.Sprintf("http://localhost:3000/auth?token=%s", jwtToken)
 	return c.Redirect(redirectURL, http.StatusTemporaryRedirect)
 }
 
@@ -234,7 +244,7 @@ func init() {
 		ClientID:     googleOAuthConfig.ClientID,
 		ClientSecret: googleOAuthConfig.ClientSecret,
 		RedirectURL:  googleOAuthConfig.RedirectURL,
-		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"}, // Scope for user's email
+		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"},
 		Endpoint:     google.Endpoint,
 	}
 }

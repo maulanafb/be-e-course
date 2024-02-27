@@ -1,6 +1,8 @@
 package user
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"errors"
 	"fmt"
 
@@ -17,7 +19,7 @@ type Service interface {
 	GetAllUsers() ([]User, error)
 	UpdateUser(input FormUpdateUserInput) (User, error)
 	CheckingEmail(email string) (User, error)
-	FindOrCreateUserByEmail(email string) (User, error)
+	FindOrCreateUserByEmail(email string, name string) (User, error)
 }
 
 type service struct {
@@ -151,21 +153,29 @@ func (s *service) CheckingEmail(email string) (User, error) {
 	return check, nil
 }
 
-func (s *service) FindOrCreateUserByEmail(email string) (User, error) {
+func (s *service) FindOrCreateUserByEmail(email string, userName string) (User, error) {
 	// 1. Cari user berdasarkan email
+	user := User{}
+
 	user, err := s.repository.FindByEmail(email)
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) { // Periksa apakah error adalah karena user tidak ditemukan
 			return user, err // return error jika errornya bukan karena user tidak ditemukan
 		}
 	}
+	randomPassword, err := generateRandomPassword(12)
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(randomPassword), bcrypt.MinCost)
+	if err != nil {
+		return user, err
+	}
 
+	user.Password = string(passwordHash)
+	user.Name = userName
+	user.Email = email
+	user.Role = "user"
 	// 2. Jika tidak ditemukan, buat user baru
 	if user.ID == 0 {
-		user = User{
-			Email: email,
-			// ... inisialisasi field user lainnya (nama, role, dll.)
-		}
+
 		user, err = s.repository.Save(user)
 		if err != nil {
 			return user, err
@@ -173,4 +183,13 @@ func (s *service) FindOrCreateUserByEmail(email string) (User, error) {
 	}
 
 	return user, nil
+}
+
+func generateRandomPassword(length int) (string, error) {
+	randomBytes := make([]byte, (length*3)/4)
+	_, err := rand.Read(randomBytes)
+	if err != nil {
+		return "", err
+	}
+	return base64.URLEncoding.EncodeToString(randomBytes)[:length], nil
 }
