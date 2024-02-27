@@ -4,17 +4,35 @@ import (
 	"be_online_course/auth"
 	"be_online_course/helper"
 	"be_online_course/user"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/joho/godotenv"
+
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 type UserHandler struct {
 	userService user.Service
 	authService auth.Service
 }
+
+// Google OAuth Configuration
+type GoogleOAuthConfig struct {
+	ClientID     string `json:"client_id"`
+	ClientSecret string `json:"client_secret"`
+	RedirectURL  string `json:"redirect_url"`
+}
+
+var (
+	googleOAuthConfig GoogleOAuthConfig
+	googleOauthClient *oauth2.Config
+)
 
 func NewUserHandler(userService user.Service, authService auth.Service) *UserHandler {
 	return &UserHandler{userService, authService}
@@ -154,4 +172,69 @@ func (h *UserHandler) FetchUser(c *fiber.Ctx) error {
 	response := helper.FiberAPIResponse(c, "Successfully fetch user data", http.StatusOK, "success", formatter)
 
 	return response
+}
+
+func (h *UserHandler) GoogleLogin(c *fiber.Ctx) error {
+	url := googleOauthClient.AuthCodeURL("state")
+
+	return c.Redirect(url, http.StatusTemporaryRedirect)
+}
+
+// Handle Google OAuth callback
+func (h *UserHandler) GoogleCallback(c *fiber.Ctx) error {
+	code := c.Query("code")
+
+	token, err := googleOauthClient.Exchange(oauth2.NoContext, code)
+	if err != nil {
+		return err
+	}
+
+	client := googleOauthClient.Client(oauth2.NoContext, token)
+	userInfoResp, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
+	if err != nil {
+		return err
+	}
+	defer userInfoResp.Body.Close()
+
+	var userInfo struct {
+		Email string `json:"email"`
+		// ... other fields you may need
+	}
+	if err := json.NewDecoder(userInfoResp.Body).Decode(&userInfo); err != nil {
+		return err
+	}
+
+	// Find or create user in database
+	user, err := h.userService.FindOrCreateUserByEmail(userInfo.Email)
+	if err != nil {
+		return err
+	}
+
+	// Generate JWT token
+	jwtToken, err := h.authService.GenerateToken(user.ID)
+	if err != nil {
+		return err
+	}
+
+	// Redirect user to frontend with token
+	redirectURL := fmt.Sprintf("http://localhost:3000/signin?token=%s", jwtToken)
+	return c.Redirect(redirectURL, http.StatusTemporaryRedirect)
+}
+
+func init() {
+	godotenv.Load()
+	// Read Google OAuth configuration from environment variables
+	googleOAuthConfig = GoogleOAuthConfig{
+		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
+		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+		RedirectURL:  "http://localhost:8088/api/v1/google-callback",
+	}
+
+	googleOauthClient = &oauth2.Config{
+		ClientID:     googleOAuthConfig.ClientID,
+		ClientSecret: googleOAuthConfig.ClientSecret,
+		RedirectURL:  googleOAuthConfig.RedirectURL,
+		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"}, // Scope for user's email
+		Endpoint:     google.Endpoint,
+	}
 }

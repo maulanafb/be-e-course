@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type Service interface {
@@ -16,6 +17,7 @@ type Service interface {
 	GetAllUsers() ([]User, error)
 	UpdateUser(input FormUpdateUserInput) (User, error)
 	CheckingEmail(email string) (User, error)
+	FindOrCreateUserByEmail(email string) (User, error)
 }
 
 type service struct {
@@ -147,4 +149,28 @@ func (s *service) CheckingEmail(email string) (User, error) {
 		return check, err
 	}
 	return check, nil
+}
+
+func (s *service) FindOrCreateUserByEmail(email string) (User, error) {
+	// 1. Cari user berdasarkan email
+	user, err := s.repository.FindByEmail(email)
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) { // Periksa apakah error adalah karena user tidak ditemukan
+			return user, err // return error jika errornya bukan karena user tidak ditemukan
+		}
+	}
+
+	// 2. Jika tidak ditemukan, buat user baru
+	if user.ID == 0 {
+		user = User{
+			Email: email,
+			// ... inisialisasi field user lainnya (nama, role, dll.)
+		}
+		user, err = s.repository.Save(user)
+		if err != nil {
+			return user, err
+		}
+	}
+
+	return user, nil
 }

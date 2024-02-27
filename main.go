@@ -22,11 +22,16 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	GormConfig := &gorm.Config{
 		// ...
 		NowFunc: func() time.Time {
@@ -79,6 +84,8 @@ func main() {
 
 	api := app.Group("/api/v1")
 	api.Post("/users", userHandler.RegisterUser)
+	api.Get("/google-login", userHandler.GoogleLogin)
+	api.Get("/google-callback", userHandler.GoogleCallback)
 	api.Post("/sessions", userHandler.Login)
 	api.Get("/users/fetch", authMiddleware(authService, userService), userHandler.FetchUser)
 
@@ -99,8 +106,8 @@ func main() {
 
 	api.Post("/lesson/create", authMiddleware(authService, userService), roleMiddleware("admin"), lessonHandler.CreateLesson)
 
-	api.Post("/transactions/:course_slug", authMiddleware(authService, userService), transactionHandler.CreateTransaction)
 	api.Post("/transactions/notification", transactionHandler.GetNotification)
+	api.Post("/transactions/:course_slug", authMiddleware(authService, userService), transactionHandler.CreateTransaction)
 
 	app.Listen(":8088")
 }
@@ -146,16 +153,14 @@ func authMiddleware(authService auth.Service, userService user.Service) fiber.Ha
 
 func roleMiddleware(requiredRole string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// Ambil currentUser dari context
 		currentUser := c.Locals("currentUser").(user.User)
 		fmt.Println(currentUser)
-		// Periksa apakah currentUser memiliki peran yang sesuai
 		if currentUser.Role != requiredRole {
 			response := helper.APIResponse("Forbidden", http.StatusForbidden, "error", nil)
 			return c.Status(http.StatusForbidden).JSON(response)
 		}
 
-		// Lanjutkan ke handler berikutnya jika peran sesuai
+		// donttt ask why its working :)
 		return c.Next()
 	}
 }
