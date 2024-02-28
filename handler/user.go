@@ -205,14 +205,10 @@ func (h *UserHandler) GoogleCallback(c *fiber.Ctx) error {
 		EmailVerified bool   `json:"email_verified"` // Optional: Whether email is verified
 		Locale        string `json:"locale"`         // Optional: User's locale
 	}
-
 	if err := json.NewDecoder(userInfoResp.Body).Decode(&userInfo); err != nil {
 		return err
 	}
 	fmt.Println(userInfo)
-	fmt.Println(userInfo.Name)
-	fmt.Println(userInfo.Picture)
-	fmt.Println(userInfo.Email)
 	// Find or create user in database
 	user, err := h.userService.FindOrCreateUserByEmail(userInfo.Email, userInfo.GivenName)
 
@@ -233,7 +229,6 @@ func (h *UserHandler) GoogleCallback(c *fiber.Ctx) error {
 
 func init() {
 	godotenv.Load()
-	// Read Google OAuth configuration from environment variables
 	googleOAuthConfig = GoogleOAuthConfig{
 		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
 		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
